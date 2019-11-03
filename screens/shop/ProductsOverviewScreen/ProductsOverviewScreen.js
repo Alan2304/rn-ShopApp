@@ -1,12 +1,17 @@
 import React from 'react';
-import { FlatList, Text } from 'react-native';
-import { useSelector } from 'react-redux';
+import { FlatList, Text, Platform } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import styles from './styles';
 
 import ProductItem from '../../../components/shop/ProductItem/ProductItem';
+import HeaderButton from '../../../components/UI/HeaderButton/HeaderButton';
+import * as cartActions from '../../../store/actions/cart';
 
 const ProductsOverviewScreen = props => {
     const products = useSelector(state => state.products.availableProduct);
+    const dispatch = useDispatch();
+
     return (
         <FlatList 
             data={products} 
@@ -22,13 +27,19 @@ const ProductsOverviewScreen = props => {
                             productTitle: item.title
                         });
                     }} 
-                    onAddToCart={() => {}} /> 
+                    onAddToCart={() => {
+                        dispatch(cartActions.addToCart(item))
+                    }} /> 
             } />
     );
 }
 
 ProductsOverviewScreen.navigationOptions = {
-    headerTitle: 'All Products'
+    headerTitle: 'All Products',
+    headerRight: 
+        <HeaderButtons HeaderButtonComponent={HeaderButton}>
+            <Item  title='Cart' iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'} onPress={() => {}}/>
+        </HeaderButtons>
 }
 
 export default ProductsOverviewScreen
