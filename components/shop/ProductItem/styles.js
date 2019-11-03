@@ -12,6 +12,10 @@ const styles = StyleSheet.create({
         height: 300,
         margin: 20
     },
+    touchable: {
+        borderRadius: 10,
+        overflow: 'hidden'
+    },
     imageContainer: {
         width: '100%',
         height: '60%'
