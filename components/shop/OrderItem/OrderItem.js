@@ -5,10 +5,12 @@ import CartItem from '../CartItem/CartItem'
 import styles from './styles';
 import Colors from '../../../constants/Colors';
 
+import Card from '../../UI/Card/Card';
+
 const OrderItem = props => {
     const [showDetails, setShowDetails] = useState(false);
     return (
-        <View style={styles.orderItem}>
+        <Card style={styles.orderItem}>
             <View style={styles.summary}>
                 <Text style={styles.totalAmount}>${props.amount.toFixed(2)}</Text>
                 <Text style={styles.date}>{props.date}</Text>
@@ -31,7 +33,7 @@ const OrderItem = props => {
                     ))}
                 </View>
             )}
-        </View>
+        </Card>
     )
 }
 
