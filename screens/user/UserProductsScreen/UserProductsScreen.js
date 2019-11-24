@@ -1,18 +1,33 @@
 import React from 'react';
-import { FlatList, Platform, Button } from 'react-native';
-import { useSelector } from 'react-redux';
+import { FlatList, Platform, Button, Alert } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 
 import ProductItem from '../../../components/shop/ProductItem/ProductItem';
 import HeaderButton from '../../../components/UI/HeaderButton/HeaderButton';
+import * as productActions from '../../../store/actions/product';
 import Colors from '../../../constants/Colors';
 
 const UserProductsScreen = props => {
     const userProducts = useSelector(state => state.products.userProducts);
-    
+    const dispatch = useDispatch();
+
     const editProductHandler = (id) => {
         props.navigation.navigate('EditProduct', {productId: id});
+    }
+
+    const deleteHandler = (id) => {
+        Alert.alert('Are you sure?', 'Do you really want to delete this item?', [
+            {text: 'No', style: 'default'},
+            {
+                text: 'Yes', 
+                style: 'destructive', 
+                onPress: () => {
+                    dispatch(productActions.deleteProduct(id));
+                }
+            }
+        ])
     }
 
     return (
@@ -33,9 +48,7 @@ const UserProductsScreen = props => {
                             color={Colors.primary} />
                         <Button 
                             title="Delete" 
-                            onPress={() => {
-                                editProductHandler(item.id);
-                            }} 
+                            onPress={deleteHandler.bind(this, item.id)} 
                             color={Colors.primary} />
                 </ProductItem>
             )} />
