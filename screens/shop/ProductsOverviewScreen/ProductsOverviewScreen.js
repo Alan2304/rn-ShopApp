@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { FlatList, Button, Platform, ActivityIndicator, View, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -12,23 +12,48 @@ import Colors from '../../../constants/Colors';
 
 const ProductsOverviewScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
     const products = useSelector(state => state.products.availableProduct);
     const dispatch = useDispatch();
 
+    const loadProducts = useCallback(async () => {
+        setError(null);
+        setIsLoading(true);
+        try {
+            await dispatch(productsActions.fetchProducts());
+        } catch (error) {
+            console.log('hello');
+            setError(error.message);
+        }
+        setIsLoading(false);
+    }, [dispatch, setIsLoading, setError]);
+
     useEffect(() => {
-        const loadProducts = async () => {
-            setIsLoading(true);
-            await dispatch(productsActions.fetchProducts()).then().catch();
-            setIsLoading(false);
-        };
+        const willFocusSub = props.navigation.addListener('willFocus', loadProducts);   
+        
+        return () => {
+            willFocusSub.remove();
+        }
+    }, [loadProducts])
+
+    useEffect(() => {
         loadProducts();
-    }, [dispatch]);
+    }, [dispatch, loadProducts]);
 
     const selectItemHandler = (id, title) => {
         props.navigation.navigate('ProductDetail', {
             productId: id,
             productTitle: title
         });
+    }
+
+    if (error) {
+        return (
+            <View style={styles.centered}>
+                <Text>An error occurred!</Text>
+                <Button title="Try Again" onPress={loadProducts} color={Colors.primary} />
+            </View>
+        )
     }
 
     if (isLoading) {
