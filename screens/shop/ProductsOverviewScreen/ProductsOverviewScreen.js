@@ -1,5 +1,5 @@
-import React from 'react';
-import { FlatList, Button, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Button, Platform, ActivityIndicator, View, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import styles from './styles';
@@ -7,17 +7,44 @@ import styles from './styles';
 import ProductItem from '../../../components/shop/ProductItem/ProductItem';
 import HeaderButton from '../../../components/UI/HeaderButton/HeaderButton';
 import * as cartActions from '../../../store/actions/cart';
+import * as productsActions from '../../../store/actions/product';
 import Colors from '../../../constants/Colors';
 
 const ProductsOverviewScreen = props => {
+    const [isLoading, setIsLoading] = useState(false);
     const products = useSelector(state => state.products.availableProduct);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            setIsLoading(true);
+            await dispatch(productsActions.fetchProducts()).then().catch();
+            setIsLoading(false);
+        };
+        loadProducts();
+    }, [dispatch]);
 
     const selectItemHandler = (id, title) => {
         props.navigation.navigate('ProductDetail', {
             productId: id,
             productTitle: title
         });
+    }
+
+    if (isLoading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size='large' color={Colors.primary} />
+            </View>
+        );
+    }
+
+    if (!isLoading && products.length === 0) {
+        return (
+            <View style={styles.centered}>
+                <Text>No Products found. Maybe start ading some!</Text>
+            </View>
+        );
     }
 
     return (
